@@ -15,4 +15,5 @@ export type ChatRequest = {
 export type ChatResponse = {
   response: string
   session_id: string
+  execution_log: string[]
 }

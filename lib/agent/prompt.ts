@@ -28,8 +28,9 @@ Only start this workflow when the customer explicitly asks for a refund:
 2. Look up the customer with customer_lookup using the order's customer_id
 3. Search relevant policy clauses with refund_policy_search
 4. Run check_refund_eligibility with order_id, customer_id, and the customer's stated reason
-5. Always run create_refund_request to submit and record the request (even if denied or escalated)
-6. Explain the decision naturally, including the request_id if created
+5. Only run create_refund_request when eligible is true or decision is ESCALATED
+6. Do NOT call create_refund_request when decision is DENIED — explain the denial using the eligibility result
+7. Explain the decision naturally, including the request_id if a request was created
 
 Possible refund outcomes:
 - APPROVED — refund will be processed

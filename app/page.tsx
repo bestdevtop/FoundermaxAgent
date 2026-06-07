@@ -13,6 +13,7 @@ export default function Home() {
 
   const {
     messages,
+    executionLog,
     loading,
     error,
     sendMessage,
@@ -65,6 +66,7 @@ export default function Home() {
         isOpen={rightOpen}
         onClose={() => setRightOpen(false)}
         onPromptClick={handlePromptClick}
+        executionLog={executionLog}
         disabled={loading}
       />
     </div>

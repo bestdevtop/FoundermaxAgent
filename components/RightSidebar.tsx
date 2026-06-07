@@ -1,9 +1,12 @@
 'use client'
 
+import { useState } from 'react'
+import { BackendLogDialog } from '@/components/BackendLogDialog'
 import {
   ChevronRightIcon,
   ClockIcon,
   CloseIcon,
+  InfoIcon,
   LockIcon,
   RobotIcon,
   ShieldIcon,
@@ -27,10 +30,12 @@ type Props = {
   isOpen: boolean
   onClose: () => void
   onPromptClick: (prompt: string) => void
+  executionLog: string[]
   disabled?: boolean
 }
 
-export function RightSidebar({ isOpen, onClose, onPromptClick, disabled }: Props) {
+export function RightSidebar({ isOpen, onClose, onPromptClick, executionLog, disabled }: Props) {
+  const [logOpen, setLogOpen] = useState(false)
   return (
     <>
       <aside className={`right-sidebar ${isOpen ? 'open' : ''}`}>
@@ -77,8 +82,21 @@ export function RightSidebar({ isOpen, onClose, onPromptClick, disabled }: Props
               </li>
             ))}
           </ul>
+          <button
+            type="button"
+            className="backend-log-btn"
+            onClick={() => setLogOpen(true)}
+          >
+            <InfoIcon size={16} />
+            <span>View Backend Log</span>
+          </button>
         </div>
       </aside>
+      <BackendLogDialog
+        isOpen={logOpen}
+        onClose={() => setLogOpen(false)}
+        log={executionLog}
+      />
       {isOpen && <div className="sidebar-overlay right-overlay" onClick={onClose} aria-hidden="true" />}
     </>
   )

@@ -11,6 +11,7 @@ type ChatSession = {
   title: string
   backendSessionId: string
   messages: ChatMessage[]
+  executionLog: string[]
   updatedAt: string
 }
 
@@ -31,6 +32,7 @@ function createSession(title = 'New Chat'): ChatSession {
     title,
     backendSessionId: crypto.randomUUID(),
     messages: [welcomeMessage()],
+    executionLog: [],
     updatedAt: new Date().toISOString(),
   }
 }
@@ -42,6 +44,7 @@ function loadSessions(): ChatSession[] {
     const parsed = JSON.parse(raw) as ChatSession[]
     return parsed.map((s) => ({
       ...s,
+      executionLog: s.executionLog ?? [],
       messages: s.messages.map((m) => ({ ...m, timestamp: new Date(m.timestamp) })),
     }))
   } catch {
@@ -217,6 +220,7 @@ export function useChatSessions() {
               ...s,
               backendSessionId: data.session_id,
               messages: [...s.messages, assistantMessage],
+              executionLog: data.execution_log ?? [],
               updatedAt: new Date().toISOString(),
             }
           }),
@@ -232,6 +236,7 @@ export function useChatSessions() {
 
   return {
     messages: activeSession?.messages ?? [],
+    executionLog: activeSession?.executionLog ?? [],
     loading,
     error,
     sendMessage,

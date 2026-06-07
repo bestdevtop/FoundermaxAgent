@@ -177,7 +177,7 @@ export const checkRefundEligibility = tool(
   {
     name: 'check_refund_eligibility',
     description:
-      'Check whether a refund is eligible for an order without creating a request. Returns eligible (true/false), decision (APPROVED/DENIED/ESCALATED), reasons, and policy reference. Always call this before create_refund_request.',
+      'Check whether a refund is eligible for an order without creating a request. Returns eligible (true/false), decision (APPROVED/DENIED/ESCALATED), reasons, and policy reference. Always call this before create_refund_request. If decision is DENIED, do not call create_refund_request.',
     schema: z.object({
       order_id: z.string().describe('The order ID'),
       customer_id: z.string().describe('The customer ID'),
@@ -204,7 +204,7 @@ export const createRefundRequest = tool(
   {
     name: 'create_refund_request',
     description:
-      'Create a refund request for an order. Runs eligibility check and persists the request. Only call when the customer explicitly asks for a refund. Returns request_id, decision (APPROVED/DENIED/ESCALATED), reasons, and policy reference.',
+      'Create and persist a refund request for an order. Only call after check_refund_eligibility when eligible is true or decision is ESCALATED. Do not call when decision is DENIED. Returns request_id, decision (APPROVED/ESCALATED), reasons, and policy reference.',
     schema: z.object({
       order_id: z.string().describe('The order ID'),
       customer_id: z.string().describe('The customer ID'),

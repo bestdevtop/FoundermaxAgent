@@ -18,8 +18,12 @@ export async function POST(request: Request) {
   }
 
   try {
-    const [response, sessionId] = await runAgent(message, body.session_id)
-    return NextResponse.json({ response, session_id: sessionId })
+    const [response, sessionId, executionLog] = await runAgent(message, body.session_id)
+    return NextResponse.json({
+      response,
+      session_id: sessionId,
+      execution_log: executionLog,
+    })
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error)
     return NextResponse.json({ detail }, { status: 500 })

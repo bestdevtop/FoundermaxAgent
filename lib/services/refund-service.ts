@@ -222,6 +222,18 @@ export function createRefundRequest(order: Order, customer: Customer, reason: st
   }
 
   const evaluation = evaluateRefund(order, customer, reason)
+  if (evaluation.decision === 'DENIED') {
+    return {
+      order_id: orderId,
+      customer_id: customerId,
+      reason,
+      decision: 'DENIED',
+      reasons: evaluation.reasons,
+      policy_reference: evaluation.policy_reference,
+      message: 'Refund request denied based on policy. No request was created.',
+    }
+  }
+
   const requestId = `RR-${randomBytes(4).toString('hex').toUpperCase()}`
   const createdAt = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')
 

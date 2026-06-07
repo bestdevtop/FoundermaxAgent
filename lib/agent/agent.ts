@@ -3,6 +3,7 @@ import { AIMessage, HumanMessage, type BaseMessage } from '@langchain/core/messa
 import { MemorySaver } from '@langchain/langgraph'
 import { ChatOpenAI } from '@langchain/openai'
 import { createAgent } from 'langchain'
+import { buildExecutionLog } from '@/lib/agent/execution-log'
 import { SYSTEM_PROMPT } from '@/lib/agent/prompt'
 import { initDb } from '@/lib/db/init'
 import { initOrders } from '@/lib/services/order-service'
@@ -60,7 +61,7 @@ function extractResponse(messages: BaseMessage[]): string {
 export async function runAgent(
   message: string,
   sessionId?: string | null,
-): Promise<[string, string]> {
+): Promise<[string, string, string[]]> {
   bootstrap()
 
   const threadId = sessionId ?? randomUUID()
@@ -75,5 +76,8 @@ export async function runAgent(
     },
   )
 
-  return [extractResponse(result.messages as BaseMessage[]), threadId]
+  const messages = result.messages as BaseMessage[]
+  const executionLog = buildExecutionLog(messages, { message, sessionId: threadId })
+
+  return [extractResponse(messages), threadId, executionLog]
 }
