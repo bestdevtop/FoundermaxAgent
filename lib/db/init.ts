@@ -1,8 +1,7 @@
 import fs from 'fs'
 import Database from 'better-sqlite3'
-import { DATA_DIR } from '@/lib/paths'
+import { DATA_DIR, DB_PATH, RUNTIME_DIR } from '@/lib/paths'
 
-const DB_PATH = `${DATA_DIR}/foundermax.db`
 const CUSTOMERS_CSV = `${DATA_DIR}/customers.csv`
 
 const CREATE_CUSTOMERS_TABLE = `
@@ -61,7 +60,7 @@ function parseCsv(content: string): Record<string, string>[] {
 export function initDb(): void {
   if (initialized) return
 
-  fs.mkdirSync(DATA_DIR, { recursive: true })
+  fs.mkdirSync(RUNTIME_DIR, { recursive: true })
   const conn = getConnection()
 
   conn.exec(CREATE_CUSTOMERS_TABLE)

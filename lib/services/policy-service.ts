@@ -4,10 +4,11 @@ import { Document } from '@langchain/core/documents'
 import { FaissStore } from '@langchain/community/vectorstores/faiss'
 import { OpenAIEmbeddings } from '@langchain/openai'
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters'
-import { DATA_DIR } from '@/lib/paths'
+import { DATA_DIR, RUNTIME_DIR } from '@/lib/paths'
 
 const POLICY_PATH = path.join(DATA_DIR, 'refund_return_policy_v2026.txt')
-const FAISS_INDEX_DIR = path.join(DATA_DIR, 'faiss_index')
+const FAISS_INDEX_DIR = path.join(RUNTIME_DIR, 'faiss_index')
+const BUNDLED_FAISS_INDEX_DIR = path.join(DATA_DIR, 'faiss_index')
 
 let vectorstore: FaissStore | null = null
 
@@ -18,6 +19,11 @@ export async function initPolicyIndex(): Promise<void> {
 
   if (fs.existsSync(FAISS_INDEX_DIR)) {
     vectorstore = await FaissStore.load(FAISS_INDEX_DIR, embeddings)
+    return
+  }
+
+  if (fs.existsSync(BUNDLED_FAISS_INDEX_DIR)) {
+    vectorstore = await FaissStore.load(BUNDLED_FAISS_INDEX_DIR, embeddings)
     return
   }
 

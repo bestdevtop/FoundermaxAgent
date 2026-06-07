@@ -4,10 +4,11 @@ import { Document } from '@langchain/core/documents'
 import { FaissStore } from '@langchain/community/vectorstores/faiss'
 import { OpenAIEmbeddings } from '@langchain/openai'
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters'
-import { DATA_DIR } from '@/lib/paths'
+import { DATA_DIR, RUNTIME_DIR } from '@/lib/paths'
 
 const FAQ_PATH = path.join(DATA_DIR, 'faq_knowledge_base.txt')
-const FAQ_FAISS_INDEX_DIR = path.join(DATA_DIR, 'faq_faiss_index')
+const FAQ_FAISS_INDEX_DIR = path.join(RUNTIME_DIR, 'faq_faiss_index')
+const BUNDLED_FAQ_FAISS_INDEX_DIR = path.join(DATA_DIR, 'faq_faiss_index')
 
 let vectorstore: FaissStore | null = null
 
@@ -18,6 +19,11 @@ export async function initFaqIndex(): Promise<void> {
 
   if (fs.existsSync(FAQ_FAISS_INDEX_DIR)) {
     vectorstore = await FaissStore.load(FAQ_FAISS_INDEX_DIR, embeddings)
+    return
+  }
+
+  if (fs.existsSync(BUNDLED_FAQ_FAISS_INDEX_DIR)) {
+    vectorstore = await FaissStore.load(BUNDLED_FAQ_FAISS_INDEX_DIR, embeddings)
     return
   }
 
