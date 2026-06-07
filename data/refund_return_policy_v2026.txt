@@ -1,0 +1,106 @@
+Refund & Return Policy v2026
+
+1. Standard Return Window
+
+Customers may request a refund within 30 calendar days of delivery.
+
+Requests submitted after 30 days are automatically denied.
+
+2. Eligible Refund Conditions
+
+A refund may be approved when:
+
+- The item arrived damaged.
+- The item is defective.
+- The wrong item was shipped.
+- The package was lost in transit.
+- The customer received fewer items than ordered.
+- The item is unused and returned within the return window.
+
+3. Non-Refundable Items
+
+The following items are not eligible for refunds:
+
+- Final Sale products
+- Clearance items
+- Gift cards
+- Digital downloads
+- Subscription plans
+- Personalized/customized products
+- Hygiene products once opened
+- Downloaded software licenses
+
+These requests must be automatically denied.
+
+4. Return Condition Requirements
+
+Returned products must:
+
+- Be in original condition
+- Include original packaging
+- Include accessories/manuals
+- Show no signs of misuse
+
+Failure to meet these requirements may result in:
+
+- Partial refund (up to 50%)
+- Refund denial
+
+5. Refund Amount Rules
+
+Order Value              | Action
+-------------------------|----------------------------------
+$0 - $500                | AI may approve/deny
+$500.01 - $1,000         | Human review required
+Above $1,000             | Senior manager approval required
+
+6. Fraud Detection Rules
+
+Refund requests are automatically escalated if:
+
+- Customer has more than 3 refunds in the last 12 months.
+- Customer claims "item not received" more than twice.
+- Shipping address changed after order shipment.
+- Customer account age is less than 30 days and refund exceeds $200.
+- Refund amount exceeds $500.
+
+7. Shipping Rules
+
+Customer pays return shipping unless:
+
+- Wrong item shipped
+- Defective product
+- Damaged in transit
+
+In these cases, NovaMart provides a prepaid label.
+
+8. Damaged Product Claims
+
+Customers must provide:
+
+- Minimum 2 photos
+- Claim within 7 days of delivery
+
+Otherwise, claim is denied.
+
+9. Lost Package Claims
+
+A lost package refund may be approved only when:
+
+- Carrier tracking shows "lost"
+- Delivery not confirmed
+- 10 business days have passed
+
+10. Exchange Rules
+
+Customers may request an exchange instead of a refund.
+
+Exchanges are allowed only within the 30-day return window.
+
+11. Refund Processing
+
+Approved refunds are processed:
+
+- Credit Card: 5–10 business days
+- PayPal: 3–5 business days
+- Store Credit: Immediate

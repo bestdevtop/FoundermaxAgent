@@ -1,0 +1,16 @@
+customer_id,name,email,join_date,total_orders,lifetime_spend,previous_refunds
+C001,Sarah Johnson,sarah.j@example.com,2022-03-12,18,2450.50,1
+C002,Michael Chen,michael.c@example.com,2023-01-05,7,870.25,0
+C003,Emily Rodriguez,emily.r@example.com,2021-07-22,25,5430.75,2
+C004,David Wilson,david.w@example.com,2024-11-02,3,620.00,0
+C005,Olivia Brown,olivia.b@example.com,2022-08-17,12,1980.00,1
+C006,James Taylor,james.t@example.com,2025-02-14,2,1200.00,0
+C007,Sophia Martinez,sophia.m@example.com,2020-10-05,31,8150.40,3
+C008,Ethan Clark,ethan.c@example.com,2023-06-11,9,1450.80,0
+C009,Ava Walker,ava.w@example.com,2024-03-28,5,699.99,1
+C010,Daniel Lewis,daniel.l@example.com,2022-12-01,16,3250.15,0
+C011,Mia Hall,mia.h@example.com,2025-04-05,1,799.99,0
+C012,Benjamin Young,ben.y@example.com,2023-05-20,11,2210.55,2
+C013,Charlotte King,charlotte.k@example.com,2021-02-09,22,4980.10,1
+C014,Lucas Scott,lucas.s@example.com,2025-05-01,1,1499.99,0
+C015,Amelia Green,amelia.g@example.com,2022-09-13,14,2800.45,0
