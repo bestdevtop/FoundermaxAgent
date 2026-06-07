@@ -82,8 +82,7 @@ function isRealSession(session: ChatSession): boolean {
 function refreshWelcomeMessages(sessions: ChatSession[]): ChatSession[] {
   const oldWelcomePrefixes = [
     "Hello! I'm Smart Agent",
-    "Hello! I'm FoundersMax",
-    "Hello! I'm NovaMart",
+    "Hello! I'm AI Agent from FoundersMax",
   ]
 
   return sessions.map((s) => {

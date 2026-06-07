@@ -9,7 +9,7 @@ const STATUS_TO_STAGE: Record<string, string> = {
   cancelled: 'cancelled',
 }
 
-const CARRIER = 'NovaMart Logistics'
+const CARRIER = 'FoundersMax Logistics'
 
 export function trackShipment(orderId: string) {
   const order = getOrder(orderId)

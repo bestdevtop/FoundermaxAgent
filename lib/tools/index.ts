@@ -104,7 +104,7 @@ export const refundPolicySearch = tool(
   {
     name: 'refund_policy_search',
     description:
-      'Search the NovaMart refund and return policy for relevant clauses. Use for questions about return windows, non-refundable items, escalation rules, etc.',
+      'Search the FoundersMax refund and return policy for relevant clauses. Use for questions about return windows, non-refundable items, escalation rules, etc.',
     schema: z.object({
       query: z.string().describe('The policy search query'),
     }),
@@ -122,7 +122,7 @@ export const searchKnowledgeBase = tool(
   {
     name: 'search_knowledge_base',
     description:
-      'Search the NovaMart FAQ and knowledge base for general support questions. Use for shipping times, address changes, international shipping, payment methods, account management, and order cancellations.',
+      'Search the FoundersMax FAQ and knowledge base for general support questions. Use for shipping times, address changes, international shipping, payment methods, account management, and order cancellations.',
     schema: z.object({
       query: z.string().describe('The FAQ search query'),
     }),

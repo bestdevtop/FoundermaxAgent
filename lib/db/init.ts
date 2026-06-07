@@ -2,7 +2,7 @@ import fs from 'fs'
 import Database from 'better-sqlite3'
 import { DATA_DIR } from '@/lib/paths'
 
-const DB_PATH = `${DATA_DIR}/novamart.db`
+const DB_PATH = `${DATA_DIR}/foundermax.db`
 const CUSTOMERS_CSV = `${DATA_DIR}/customers.csv`
 
 const CREATE_CUSTOMERS_TABLE = `

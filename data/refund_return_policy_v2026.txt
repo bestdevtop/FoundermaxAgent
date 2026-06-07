@@ -72,7 +72,7 @@ Customer pays return shipping unless:
 - Defective product
 - Damaged in transit
 
-In these cases, NovaMart provides a prepaid label.
+In these cases, FoundersMax provides a prepaid label.
 
 8. Damaged Product Claims
 

@@ -35,7 +35,6 @@ yarn-error.log*
 !.env.example
 
 # generated runtime data
-/data/novamart.db
 /data/faiss_index/
 /data/faq_faiss_index/
 
