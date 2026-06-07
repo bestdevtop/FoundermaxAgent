@@ -5,7 +5,7 @@ import { ChatOpenAI } from '@langchain/openai'
 import { createAgent } from 'langchain'
 import { buildExecutionLog } from '@/lib/agent/execution-log'
 import { SYSTEM_PROMPT } from '@/lib/agent/prompt'
-import { initDb } from '@/lib/db/init'
+import { initCustomers } from '@/lib/services/customer-service'
 import { initOrders } from '@/lib/services/order-service'
 import * as knowledgeService from '@/lib/services/knowledge-service'
 import * as policyService from '@/lib/services/policy-service'
@@ -17,7 +17,7 @@ let bootstrapped = false
 
 function bootstrap(): void {
   if (bootstrapped) return
-  initDb()
+  initCustomers()
   initOrders()
   bootstrapped = true
 }

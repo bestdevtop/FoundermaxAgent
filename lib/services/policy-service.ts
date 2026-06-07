@@ -4,11 +4,10 @@ import { Document } from '@langchain/core/documents'
 import { FaissStore } from '@langchain/community/vectorstores/faiss'
 import { OpenAIEmbeddings } from '@langchain/openai'
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters'
-import { DATA_DIR, RUNTIME_DIR } from '@/lib/paths'
+import { DATA_DIR, IS_SERVERLESS } from '@/lib/paths'
 
 const POLICY_PATH = path.join(DATA_DIR, 'refund_return_policy_v2026.txt')
-const FAISS_INDEX_DIR = path.join(RUNTIME_DIR, 'faiss_index')
-const BUNDLED_FAISS_INDEX_DIR = path.join(DATA_DIR, 'faiss_index')
+const FAISS_INDEX_DIR = path.join(DATA_DIR, 'faiss_index')
 
 let vectorstore: FaissStore | null = null
 
@@ -22,19 +21,17 @@ export async function initPolicyIndex(): Promise<void> {
     return
   }
 
-  if (fs.existsSync(BUNDLED_FAISS_INDEX_DIR)) {
-    vectorstore = await FaissStore.load(BUNDLED_FAISS_INDEX_DIR, embeddings)
-    return
-  }
-
   const text = fs.readFileSync(POLICY_PATH, 'utf-8')
   const documents = [new Document({ pageContent: text })]
   const splitter = new RecursiveCharacterTextSplitter({ chunkSize: 500, chunkOverlap: 50 })
   const chunks = await splitter.splitDocuments(documents)
 
   vectorstore = await FaissStore.fromDocuments(chunks, embeddings)
-  fs.mkdirSync(FAISS_INDEX_DIR, { recursive: true })
-  await vectorstore.save(FAISS_INDEX_DIR)
+
+  if (!IS_SERVERLESS) {
+    fs.mkdirSync(FAISS_INDEX_DIR, { recursive: true })
+    await vectorstore.save(FAISS_INDEX_DIR)
+  }
 }
 
 export function getPolicy(): string {

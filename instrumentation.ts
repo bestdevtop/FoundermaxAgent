@@ -1,9 +1,9 @@
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
-    const { initDb } = await import('@/lib/db/init')
+    const { initCustomers } = await import('@/lib/services/customer-service')
     const { initOrders } = await import('@/lib/services/order-service')
 
-    initDb()
+    initCustomers()
     initOrders()
 
     try {

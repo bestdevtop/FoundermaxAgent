@@ -1,34 +1,12 @@
-import { getConnection } from '@/lib/db/init'
+import {
+  getCustomer,
+  getCustomerByEmail,
+  type Customer,
+} from '@/lib/services/customer-service'
 import { getOrdersByCustomer } from '@/lib/services/order-service'
-import { getRefundRequestsByCustomer, type Customer } from '@/lib/services/refund-service'
+import { getRefundRequestsByCustomer } from '@/lib/services/refund-service'
 
-function rowToCustomer(row: Record<string, unknown>): Customer {
-  return {
-    customer_id: String(row.customer_id),
-    name: String(row.name),
-    email: String(row.email),
-    join_date: String(row.join_date),
-    total_orders: Number(row.total_orders),
-    lifetime_spend: Number(row.lifetime_spend),
-    previous_refunds: Number(row.previous_refunds),
-  }
-}
-
-export function getCustomer(customerId: string): Customer | null {
-  const row = getConnection()
-    .prepare('SELECT * FROM customers WHERE customer_id = ?')
-    .get(customerId.toUpperCase()) as Record<string, unknown> | undefined
-
-  return row ? rowToCustomer(row) : null
-}
-
-export function getCustomerByEmail(email: string): Customer | null {
-  const row = getConnection()
-    .prepare('SELECT * FROM customers WHERE LOWER(email) = LOWER(?)')
-    .get(email.trim()) as Record<string, unknown> | undefined
-
-  return row ? rowToCustomer(row) : null
-}
+export { getCustomer, getCustomerByEmail, type Customer }
 
 export function getCustomerHistory(customerId: string) {
   const customer = getCustomer(customerId)

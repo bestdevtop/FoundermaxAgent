@@ -1,6 +1,8 @@
 import { randomBytes } from 'crypto'
-import { getConnection } from '@/lib/db/init'
+import type { Customer } from '@/lib/services/customer-service'
 import type { Order } from '@/lib/services/order-service'
+
+export type { Customer }
 
 const NON_REFUNDABLE_KEYWORDS = [
   'final sale',
@@ -28,32 +30,24 @@ const APPROVED_REASONS = [
   'item not received',
 ]
 
-export type Customer = {
-  customer_id: string
-  name: string
-  email: string
-  join_date: string
-  total_orders: number
-  lifetime_spend: number
-  previous_refunds: number
-}
-
 type RefundEvaluation = {
   decision: 'APPROVED' | 'DENIED' | 'ESCALATED'
   reasons: string[]
   policy_reference?: string
 }
 
-type RefundRequestRow = {
+type RefundRequest = {
   request_id: string
   order_id: string
   customer_id: string
   reason: string
   decision: string
-  reasons_json: string
+  reasons: string[]
   policy_reference: string | null
   created_at: string
 }
+
+const refundRequests: RefundRequest[] = []
 
 function parseDate(value: string | undefined): Date | null {
   if (!value) return null
@@ -174,32 +168,18 @@ export function checkEligibility(
   }
 }
 
-function rowToRefundRequest(row: RefundRequestRow) {
-  const { reasons_json, ...rest } = row
-  return {
-    ...rest,
-    reasons: JSON.parse(reasons_json) as string[],
-  }
-}
-
 export function getRefundRequestByOrder(orderId: string) {
-  const row = getConnection()
-    .prepare(
-      'SELECT * FROM refund_requests WHERE order_id = ? ORDER BY created_at DESC LIMIT 1',
-    )
-    .get(orderId.toUpperCase()) as RefundRequestRow | undefined
-
-  return row ? rowToRefundRequest(row) : null
+  const normalized = orderId.toUpperCase()
+  const matches = refundRequests.filter((r) => r.order_id === normalized)
+  matches.sort((a, b) => b.created_at.localeCompare(a.created_at))
+  return matches[0] ?? null
 }
 
 export function getRefundRequestsByCustomer(customerId: string) {
-  const rows = getConnection()
-    .prepare(
-      'SELECT * FROM refund_requests WHERE customer_id = ? ORDER BY created_at DESC',
-    )
-    .all(customerId.toUpperCase()) as RefundRequestRow[]
-
-  return rows.map(rowToRefundRequest)
+  const normalized = customerId.toUpperCase()
+  return refundRequests
+    .filter((r) => r.customer_id === normalized)
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
 }
 
 export function createRefundRequest(order: Order, customer: Customer, reason: string) {
@@ -237,25 +217,17 @@ export function createRefundRequest(order: Order, customer: Customer, reason: st
   const requestId = `RR-${randomBytes(4).toString('hex').toUpperCase()}`
   const createdAt = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')
 
-  getConnection()
-    .prepare(
-      `
-      INSERT INTO refund_requests (
-        request_id, order_id, customer_id, reason,
-        decision, reasons_json, policy_reference, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `,
-    )
-    .run(
-      requestId,
-      orderId.toUpperCase(),
-      customerId.toUpperCase(),
-      reason,
-      evaluation.decision,
-      JSON.stringify(evaluation.reasons),
-      evaluation.policy_reference ?? null,
-      createdAt,
-    )
+  const request: RefundRequest = {
+    request_id: requestId,
+    order_id: orderId.toUpperCase(),
+    customer_id: customerId.toUpperCase(),
+    reason,
+    decision: evaluation.decision,
+    reasons: evaluation.reasons,
+    policy_reference: evaluation.policy_reference ?? null,
+    created_at: createdAt,
+  }
+  refundRequests.push(request)
 
   const messages = {
     APPROVED: 'Refund request approved and submitted for processing.',

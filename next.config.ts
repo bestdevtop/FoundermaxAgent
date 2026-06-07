@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['better-sqlite3', 'faiss-node'],
+  serverExternalPackages: ['faiss-node'],
 }
 
 export default nextConfig
