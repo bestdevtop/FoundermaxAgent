@@ -22,7 +22,6 @@
     "uuid": "^14.0.0"
   },
   "devDependencies": {
-    "faiss-node": "^0.5.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -34,10 +34,6 @@ yarn-error.log*
 .env*
 !.env.example
 
-# generated runtime data
-/data/faiss_index/
-/data/faq_faiss_index/
-
 # vercel
 .vercel
 
