@@ -155,7 +155,7 @@ export const getProductInfo = tool(
 )
 
 export const checkRefundEligibility = tool(
-  async ({ order_id, customer_id, reason }) => {
+  async ({ order_id, customer_id, reason, request_human_escalation }) => {
     const order = orderService.getOrder(order_id.trim())
     if (!order) {
       return JSON.stringify({ error: `Order not found: ${order_id}` })
@@ -166,28 +166,41 @@ export const checkRefundEligibility = tool(
       return JSON.stringify({ error: `Customer not found: ${customer_id}` })
     }
 
-    const result = refundService.checkEligibility(order, customer, reason)
+    const result = refundService.checkEligibility(
+      order,
+      customer,
+      reason,
+      undefined,
+      request_human_escalation ?? false,
+    )
     return JSON.stringify({
       order_id,
       customer_id,
       reason,
+      request_human_escalation: request_human_escalation ?? false,
       ...result,
     })
   },
   {
     name: 'check_refund_eligibility',
     description:
-      'Check whether a refund is eligible for an order without creating a request. Returns eligible (true/false), decision (APPROVED/DENIED/ESCALATED), reasons, and policy reference. Always call this before create_refund_request. If decision is DENIED, do not call create_refund_request.',
+      'Check whether a refund is eligible for an order without creating a request. Returns eligible (true/false), decision (APPROVED/DENIED/ESCALATED), reasons, and policy reference. Always call this before create_refund_request. If decision is DENIED, do not call create_refund_request. Set request_human_escalation to true when the customer asks to escalate, speak to a human, or talk to a manager.',
     schema: z.object({
       order_id: z.string().describe('The order ID'),
       customer_id: z.string().describe('The customer ID'),
       reason: z.string().describe('The refund reason stated by the customer'),
+      request_human_escalation: z
+        .boolean()
+        .optional()
+        .describe(
+          'Set true when the customer explicitly asks to escalate to a human, speak to a manager, or similar.',
+        ),
     }),
   },
 )
 
 export const createRefundRequest = tool(
-  async ({ order_id, customer_id, reason }) => {
+  async ({ order_id, customer_id, reason, request_human_escalation }) => {
     const order = orderService.getOrder(order_id.trim())
     if (!order) {
       return JSON.stringify({ error: `Order not found: ${order_id}` })
@@ -198,17 +211,28 @@ export const createRefundRequest = tool(
       return JSON.stringify({ error: `Customer not found: ${customer_id}` })
     }
 
-    const result = refundService.createRefundRequest(order, customer, reason)
+    const result = refundService.createRefundRequest(
+      order,
+      customer,
+      reason,
+      request_human_escalation ?? false,
+    )
     return JSON.stringify(result)
   },
   {
     name: 'create_refund_request',
     description:
-      'Create and persist a refund request for an order. Only call after check_refund_eligibility when eligible is true or decision is ESCALATED. Do not call when decision is DENIED. Returns request_id, decision (APPROVED/ESCALATED), reasons, and policy reference.',
+      'Create and persist a refund request for an order. Only call after check_refund_eligibility when eligible is true or decision is ESCALATED. Do not call when decision is DENIED. Returns request_id, decision (APPROVED/ESCALATED), reasons, and policy reference. Pass the same request_human_escalation value used in check_refund_eligibility.',
     schema: z.object({
       order_id: z.string().describe('The order ID'),
       customer_id: z.string().describe('The customer ID'),
       reason: z.string().describe('The refund reason stated by the customer'),
+      request_human_escalation: z
+        .boolean()
+        .optional()
+        .describe(
+          'Set true when the customer explicitly asks to escalate to a human, speak to a manager, or similar.',
+        ),
     }),
   },
 )

@@ -78,6 +78,35 @@ function reasonMatchesApproved(reason: string): boolean {
   return APPROVED_REASONS.some((key) => normalized.includes(key))
 }
 
+const HUMAN_ESCALATION_PHRASES = [
+  'escalate to human',
+  'escalate to a human',
+  'escalate this',
+  'want to escalate',
+  'wants to escalate',
+  'need to escalate',
+  'request escalation',
+  'speak to a human',
+  'speak with a human',
+  'talk to a human',
+  'talk to a manager',
+  'speak to a manager',
+  'speak with a manager',
+  'human agent',
+  'human representative',
+  'real person',
+  'live agent',
+]
+
+export function customerRequestedHumanEscalation(
+  reason: string,
+  requestHumanEscalation = false,
+): boolean {
+  if (requestHumanEscalation) return true
+  const normalized = normalizeReason(reason)
+  return HUMAN_ESCALATION_PHRASES.some((phrase) => normalized.includes(phrase))
+}
+
 export function checkFraudRisk(
   customer: Customer,
   order: Order,
@@ -108,7 +137,16 @@ export function evaluateRefund(
   customer: Customer,
   reason: string,
   today: Date = new Date(),
+  requestHumanEscalation = false,
 ): RefundEvaluation {
+  if (customerRequestedHumanEscalation(reason, requestHumanEscalation)) {
+    return {
+      decision: 'ESCALATED',
+      reasons: ['Customer requested escalation to a human agent'],
+      policy_reference: 'Section 6: Customer-Requested Human Review',
+    }
+  }
+
   const nonRefundable = containsNonRefundable(order)
   if (nonRefundable.length > 0) {
     return {
@@ -161,8 +199,9 @@ export function checkEligibility(
   customer: Customer,
   reason: string,
   today?: Date,
+  requestHumanEscalation = false,
 ) {
-  const result = evaluateRefund(order, customer, reason, today)
+  const result = evaluateRefund(order, customer, reason, today, requestHumanEscalation)
   return {
     eligible: result.decision === 'APPROVED',
     ...result,
@@ -187,7 +226,12 @@ export function getRefundRequestedOrderIds(): Set<string> {
   return new Set(refundRequests.map((r) => r.order_id))
 }
 
-export function createRefundRequest(order: Order, customer: Customer, reason: string) {
+export function createRefundRequest(
+  order: Order,
+  customer: Customer,
+  reason: string,
+  requestHumanEscalation = false,
+) {
   const orderId = order.order_id
   const customerId = customer.customer_id
 
@@ -206,7 +250,7 @@ export function createRefundRequest(order: Order, customer: Customer, reason: st
     }
   }
 
-  const evaluation = evaluateRefund(order, customer, reason)
+  const evaluation = evaluateRefund(order, customer, reason, new Date(), requestHumanEscalation)
   if (evaluation.decision === 'DENIED') {
     return {
       order_id: orderId,
