@@ -188,12 +188,17 @@ export function useChatSessions() {
       setLoading(true)
       setError(null)
 
+      const historyMessages = [...activeSession.messages, userMessage].map((m) => ({
+        role: m.role,
+        content: m.content,
+      }))
+
       try {
         const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            message: trimmed,
+            messages: historyMessages,
             session_id: activeSession.backendSessionId,
           }),
         })

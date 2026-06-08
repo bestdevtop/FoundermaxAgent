@@ -1,6 +1,5 @@
 import { randomUUID } from 'crypto'
 import { AIMessage, HumanMessage, type BaseMessage } from '@langchain/core/messages'
-import { MemorySaver } from '@langchain/langgraph'
 import { ChatOpenAI } from '@langchain/openai'
 import { createAgent } from 'langchain'
 import { buildExecutionLog } from '@/lib/agent/execution-log'
@@ -11,7 +10,6 @@ import * as knowledgeService from '@/lib/services/knowledge-service'
 import * as policyService from '@/lib/services/policy-service'
 import { ALL_TOOLS } from '@/lib/tools'
 
-const checkpointer = new MemorySaver()
 let agent: ReturnType<typeof createAgent> | null = null
 let bootstrapped = false
 
@@ -33,7 +31,6 @@ function getAgent() {
       model: llm,
       tools: ALL_TOOLS,
       systemPrompt: SYSTEM_PROMPT,
-      checkpointer,
     })
   }
   return agent
@@ -58,8 +55,21 @@ function extractResponse(messages: BaseMessage[]): string {
   return "I'm sorry, I couldn't generate a response. Please try again."
 }
 
+type ChatHistoryEntry = {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+function toLangChainMessages(history: ChatHistoryEntry[]): BaseMessage[] {
+  return history.map((entry) =>
+    entry.role === 'user'
+      ? new HumanMessage(entry.content)
+      : new AIMessage(entry.content),
+  )
+}
+
 export async function runAgent(
-  message: string,
+  history: ChatHistoryEntry[],
   sessionId?: string | null,
 ): Promise<[string, string, string[]]> {
   bootstrap()
@@ -69,15 +79,18 @@ export async function runAgent(
   await policyService.initPolicyIndex()
   await knowledgeService.initFaqIndex()
 
-  const result = await getAgent().invoke(
-    { messages: [new HumanMessage(message)] },
-    {
-      configurable: { thread_id: threadId },
-    },
-  )
+  const result = await getAgent().invoke({
+    messages: toLangChainMessages(history),
+  })
 
   const messages = result.messages as BaseMessage[]
-  const executionLog = buildExecutionLog(messages, { message, sessionId: threadId })
+  const lastUserMessage =
+    [...history].reverse().find((entry) => entry.role === 'user')?.content ?? ''
+  const executionLog = buildExecutionLog(messages, {
+    message: lastUserMessage,
+    sessionId: threadId,
+    historyLength: history.length,
+  })
 
   return [extractResponse(messages), threadId, executionLog]
 }

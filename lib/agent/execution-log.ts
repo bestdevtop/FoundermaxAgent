@@ -26,11 +26,12 @@ function formatResult(content: unknown): string {
 
 export function buildExecutionLog(
   messages: BaseMessage[],
-  input: { message: string; sessionId: string },
+  input: { message: string; sessionId: string; historyLength: number },
 ): string[] {
   const log: string[] = [
     '[API] POST /api/chat',
-    `      message: "${input.message}"`,
+    `      messages: ${input.historyLength} (${input.historyLength - 1} prior + latest user)`,
+    `      latest: "${input.message}"`,
     `      session_id: ${input.sessionId}`,
     '',
     `[Agent] Invoking GPT-4o-mini with ${ALL_TOOLS.length} tools`,

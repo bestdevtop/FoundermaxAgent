@@ -7,8 +7,13 @@ export type ChatMessage = {
   timestamp: Date
 }
 
+export type ChatHistoryEntry = {
+  role: MessageRole
+  content: string
+}
+
 export type ChatRequest = {
-  message: string
+  messages: ChatHistoryEntry[]
   session_id?: string
 }
 
