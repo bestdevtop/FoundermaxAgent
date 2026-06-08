@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { BackendLogDialog } from '@/components/BackendLogDialog'
+import { RefundPolicyDialog } from '@/components/RefundPolicyDialog'
 import {
   ChevronRightIcon,
   ClockIcon,
@@ -36,6 +37,7 @@ type Props = {
 
 export function RightSidebar({ isOpen, onClose, onPromptClick, executionLog, disabled }: Props) {
   const [logOpen, setLogOpen] = useState(false)
+  const [policyOpen, setPolicyOpen] = useState(false)
   return (
     <>
       <aside className={`right-sidebar ${isOpen ? 'open' : ''}`}>
@@ -64,6 +66,15 @@ export function RightSidebar({ isOpen, onClose, onPromptClick, executionLog, dis
             ))}
           </ul>
         </div>
+
+        <button
+          type="button"
+          className="policy-view-btn"
+          onClick={() => setPolicyOpen(true)}
+        >
+          <ShieldIcon size={16} />
+          <span>View Refund Policy</span>
+        </button>
 
         <div className="prompts-card">
           <h3>Suggested Prompts</h3>
@@ -97,6 +108,7 @@ export function RightSidebar({ isOpen, onClose, onPromptClick, executionLog, dis
         onClose={() => setLogOpen(false)}
         log={executionLog}
       />
+      <RefundPolicyDialog isOpen={policyOpen} onClose={() => setPolicyOpen(false)} />
       {isOpen && <div className="sidebar-overlay right-overlay" onClick={onClose} aria-hidden="true" />}
     </>
   )

@@ -774,6 +774,34 @@ code {
   border-color: var(--color-user-bubble-border);
 }
 
+.policy-view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.policy-view-btn svg {
+  flex-shrink: 0;
+}
+
+.policy-view-btn:hover {
+  background: var(--color-active-chat);
+  border-color: var(--color-user-bubble-border);
+}
+
 /* ── Backend Log Dialog ── */
 .dialog-overlay {
   position: fixed;
@@ -796,6 +824,10 @@ code {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   overflow: hidden;
+}
+
+.dialog-panel-wide {
+  width: min(720px, 100%);
 }
 
 .dialog-header {
@@ -860,6 +892,30 @@ code {
   font-size: 0.875rem;
   color: var(--color-text-secondary);
   line-height: 1.5;
+}
+
+.dialog-error {
+  margin: 0;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.dialog-policy {
+  margin: 0;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .sidebar-overlay {
