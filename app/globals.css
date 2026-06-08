@@ -204,11 +204,23 @@ code {
   gap: 2px;
 }
 
+.chat-list-item {
+  display: flex;
+  align-items: stretch;
+  gap: 0.15rem;
+}
+
+.chat-list-item:hover .chat-delete-btn,
+.chat-list-item:focus-within .chat-delete-btn {
+  opacity: 1;
+}
+
 .chat-item {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   padding: 0.65rem 0.75rem;
   border: none;
   border-radius: var(--radius-md);
@@ -250,6 +262,27 @@ code {
   height: 6px;
   border-radius: 50%;
   background: var(--color-active-dot);
+}
+
+.chat-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  margin: 0.35rem 0.25rem 0.35rem 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+}
+
+.chat-delete-btn:hover {
+  background: #fef2f2;
+  color: #b91c1c;
 }
 
 /* ── Chat Header ── */
@@ -1420,6 +1453,10 @@ code {
 
   .left-sidebar.open {
     transform: translateX(0);
+  }
+
+  .chat-delete-btn {
+    opacity: 1;
   }
 
   .right-sidebar {

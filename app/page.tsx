@@ -24,6 +24,7 @@ export default function Home() {
     chatTitle,
     createNewChat,
     selectChat,
+    deleteChat,
   } = useChatSessions()
 
   function handleNewChat() {
@@ -49,6 +50,7 @@ export default function Home() {
         onClose={() => setLeftOpen(false)}
         onNewChat={handleNewChat}
         onSelectChat={handleSelectChat}
+        onDeleteChat={deleteChat}
       />
 
       <main className="main-column">

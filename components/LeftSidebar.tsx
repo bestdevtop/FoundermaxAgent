@@ -1,6 +1,6 @@
 'use client'
 
-import { CloseIcon, PlusIcon, RobotIcon } from '@/components/Icons'
+import { CloseIcon, PlusIcon, RobotIcon, TrashIcon } from '@/components/Icons'
 
 export type ChatHistoryItem = {
   id: string
@@ -15,9 +15,17 @@ type Props = {
   onClose: () => void
   onNewChat: () => void
   onSelectChat: (id: string) => void
+  onDeleteChat: (id: string) => void
 }
 
-export function LeftSidebar({ chats, isOpen, onClose, onNewChat, onSelectChat }: Props) {
+export function LeftSidebar({
+  chats,
+  isOpen,
+  onClose,
+  onNewChat,
+  onSelectChat,
+  onDeleteChat,
+}: Props) {
   return (
     <>
       <aside className={`left-sidebar ${isOpen ? 'open' : ''}`}>
@@ -45,7 +53,7 @@ export function LeftSidebar({ chats, isOpen, onClose, onNewChat, onSelectChat }:
           <h3 className="section-label">Chats</h3>
           <ul className="chat-list">
             {chats.map((chat) => (
-              <li key={chat.id}>
+              <li key={chat.id} className="chat-list-item">
                 <button
                   type="button"
                   className={`chat-item ${chat.active ? 'active' : ''}`}
@@ -56,6 +64,14 @@ export function LeftSidebar({ chats, isOpen, onClose, onNewChat, onSelectChat }:
                     {chat.active && <span className="active-dot" />}
                     {chat.time}
                   </span>
+                </button>
+                <button
+                  type="button"
+                  className="chat-delete-btn"
+                  onClick={() => onDeleteChat(chat.id)}
+                  aria-label={`Delete chat: ${chat.title}`}
+                >
+                  <TrashIcon size={14} />
                 </button>
               </li>
             ))}

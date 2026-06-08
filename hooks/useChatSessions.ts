@@ -161,6 +161,26 @@ export function useChatSessions() {
     setError(null)
   }, [])
 
+  const deleteChat = useCallback((id: string) => {
+    setSessions((prev) => {
+      if (!prev.some((s) => s.id === id)) return prev
+
+      let next = prev.filter((s) => s.id !== id)
+      if (next.length === 0) {
+        next = [createSession()]
+      }
+
+      setActiveId((active) => {
+        if (active !== id) return active
+        const real = next.filter(isRealSession)
+        return real[0]?.id ?? next[0].id
+      })
+
+      return next
+    })
+    setError(null)
+  }, [])
+
   const sendMessage = useCallback(
     async (text: string) => {
       const trimmed = text.trim()
@@ -348,5 +368,6 @@ export function useChatSessions() {
     chatTitle,
     createNewChat,
     selectChat,
+    deleteChat,
   }
 }
