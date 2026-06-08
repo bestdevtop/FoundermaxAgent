@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { CloseIcon } from '@/components/Icons'
-import { AGENT_TOOLS, PROJECT_TREE, REQUEST_FLOW } from '@/lib/architecture-data'
+import { AGENT_TOOLS, REQUEST_FLOW } from '@/lib/architecture-data'
 
-type Tab = 'flow' | 'tools' | 'structure'
+type Tab = 'flow' | 'tools'
 
 type Props = {
   isOpen: boolean
@@ -14,7 +14,6 @@ type Props = {
 const TABS: { id: Tab; label: string }[] = [
   { id: 'flow', label: 'Request Flow' },
   { id: 'tools', label: 'Agent Tools' },
-  { id: 'structure', label: 'Project Structure' },
 ]
 
 export function ArchitectureFlowDialog({ isOpen, onClose }: Props) {
@@ -132,38 +131,6 @@ export function ArchitectureFlowDialog({ isOpen, onClose }: Props) {
                     </dl>
                   </article>
                 ))}
-              </div>
-            </div>
-          )}
-
-          {tab === 'structure' && (
-            <div className="arch-structure" role="tabpanel">
-              <p className="arch-intro">
-                Folder layout of the FoundersMax Agent project and where each piece lives.
-              </p>
-              <pre className="arch-tree">{PROJECT_TREE}</pre>
-              <div className="arch-legend">
-                <h3>Key layers</h3>
-                <ul>
-                  <li>
-                    <strong>UI</strong> — React components + useChatSessions hook (browser / localStorage)
-                  </li>
-                  <li>
-                    <strong>API</strong> — Next.js route handlers under app/api/
-                  </li>
-                  <li>
-                    <strong>Agent</strong> — LangChain setup, system prompt, runAgent()
-                  </li>
-                  <li>
-                    <strong>Tools</strong> — 9 LangChain tools wired to services
-                  </li>
-                  <li>
-                    <strong>Services</strong> — Business logic reading JSON, FAISS, or in-memory stores
-                  </li>
-                  <li>
-                    <strong>Data</strong> — Static JSON files, policy/FAQ text, pre-built vector indexes
-                  </li>
-                </ul>
               </div>
             </div>
           )}

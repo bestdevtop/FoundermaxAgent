@@ -40,7 +40,7 @@ export const REQUEST_FLOW: FlowStep[] = [
     title: 'Agent bootstraps & converts history',
     path: 'lib/agent/agent.ts',
     description:
-      'On first run: loads orders/customers from JSON, builds FAISS indexes for policy & FAQ. Converts chat history into LangChain HumanMessage / AIMessage objects.',
+      'On first run: loads orders/customers from JSON, builds in-memory vector indexes for policy & FAQ (OpenAI embeddings). Converts chat history into LangChain HumanMessage / AIMessage objects.',
   },
   {
     id: 5,
@@ -55,7 +55,7 @@ export const REQUEST_FLOW: FlowStep[] = [
     title: 'Tools call services & data',
     path: 'lib/services/* + data/*',
     description:
-      'Each tool delegates to a service layer — JSON files for orders/customers/products, FAISS vector search for policy/FAQ, rules engine for refunds.',
+      'Each tool delegates to a service layer — JSON files for orders/customers/products, in-memory vector search (RAG) for policy/FAQ, rules engine for refunds.',
   },
   {
     id: 7,
@@ -112,14 +112,14 @@ export const AGENT_TOOLS: AgentTool[] = [
   {
     name: 'refund_policy_search',
     service: 'policy-service',
-    dataSource: 'FAISS → refund_return_policy_v2026.txt',
+    dataSource: 'Vector search → refund_return_policy_v2026.txt',
     description: 'Semantic search over refund & return policy clauses.',
     useWhen: 'Return windows, non-refundable items, escalation rules',
   },
   {
     name: 'search_knowledge_base',
     service: 'knowledge-service',
-    dataSource: 'FAISS → faq_knowledge_base.txt',
+    dataSource: 'Vector search → faq_knowledge_base.txt',
     description: 'Semantic search over FAQ entries.',
     useWhen: 'Shipping, payments, account help, cancellations',
   },
@@ -138,22 +138,3 @@ export const AGENT_TOOLS: AgentTool[] = [
     useWhen: 'After check_refund_eligibility approves or escalates',
   },
 ]
-
-export const PROJECT_TREE = `foundermaxagent/
-├── app/
-│   ├── api/
-│   │   ├── chat/route.ts         ← POST agent (full message history)
-│   │   ├── customers/route.ts    ← GET customer list
-│   │   ├── health/route.ts
-│   │   ├── orders/route.ts       ← GET order list
-│   │   └── policy/route.ts       ← GET refund policy markdown
-│   ├── page.tsx                  ← 3-column chat layout
-│   └── globals.css
-├── components/                   ← React UI (chat, dialogs, sidebars)
-├── hooks/useChatSessions.ts      ← Sessions + API calls
-├── lib/
-│   ├── agent/                    ← runAgent(), prompt, execution log
-│   ├── services/                 ← Business logic + data access
-│   └── tools/index.ts            ← 9 LangChain tools
-├── types/chat.ts
-└── data/                         ← JSON files + FAISS indexes + policy/FAQ text`
