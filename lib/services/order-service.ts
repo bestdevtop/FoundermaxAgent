@@ -38,3 +38,15 @@ export function getOrdersByCustomer(customerId: string): Order[] {
   const normalized = customerId.toUpperCase()
   return loadOrders().filter((order) => order.customer_id === normalized)
 }
+
+export function getAllOrders(): Order[] {
+  return [...loadOrders()].sort((a, b) => b.order_date.localeCompare(a.order_date))
+}
+
+export function markOrderRefundRequested(orderId: string): boolean {
+  const normalized = orderId.toUpperCase()
+  const order = loadOrders().find((o) => o.order_id === normalized)
+  if (!order) return false
+  order.refund_requested = true
+  return true
+}

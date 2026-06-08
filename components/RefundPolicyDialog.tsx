@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Markdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { CloseIcon } from '@/components/Icons'
 
 type Props = {
@@ -73,7 +74,7 @@ export function RefundPolicyDialog({ isOpen, onClose }: Props) {
           {error && <p className="dialog-error">{error}</p>}
           {!loading && !error && policy && (
             <div className="dialog-policy message-markdown">
-              <Markdown>{policy}</Markdown>
+              <Markdown remarkPlugins={[remarkGfm]}>{policy}</Markdown>
             </div>
           )}
         </div>

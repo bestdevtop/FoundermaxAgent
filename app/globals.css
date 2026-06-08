@@ -774,6 +774,13 @@ code {
   border-color: var(--color-user-bubble-border);
 }
 
+.sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
 .policy-view-btn {
   display: flex;
   align-items: center;
@@ -828,6 +835,10 @@ code {
 
 .dialog-panel-wide {
   width: min(720px, 100%);
+}
+
+.dialog-panel-data {
+  width: min(960px, 100%);
 }
 
 .dialog-header {
@@ -944,6 +955,92 @@ code {
 .dialog-policy th {
   background: #f9fafb;
   font-weight: 600;
+}
+
+.dialog-data-table-wrap {
+  max-width: 100%;
+  overflow: auto;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+}
+
+.dialog-data-table {
+  width: 100%;
+  min-width: 720px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.dialog-data-table th,
+.dialog-data-table td {
+  padding: 0.5rem 0.65rem;
+  border-bottom: 1px solid var(--color-border-light);
+  text-align: left;
+  vertical-align: top;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.dialog-data-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f9fafb;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.dialog-data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.dialog-data-table tbody tr:hover {
+  background: rgba(99, 102, 241, 0.04);
+}
+
+.dialog-data-cell-compact {
+  white-space: nowrap;
+}
+
+.dialog-data-cell-wrap {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.dialog-data-table .col-id {
+  width: 7%;
+}
+
+.dialog-data-table .col-name {
+  width: 14%;
+}
+
+.dialog-data-table .col-email {
+  width: 26%;
+}
+
+.dialog-data-table .col-date {
+  width: 11%;
+}
+
+.dialog-data-table .col-num {
+  width: 7%;
+}
+
+.dialog-data-table .col-money {
+  width: 10%;
+}
+
+.dialog-data-table .col-items {
+  width: 32%;
+}
+
+.dialog-data-table .col-status {
+  width: 10%;
 }
 
 .sidebar-overlay {

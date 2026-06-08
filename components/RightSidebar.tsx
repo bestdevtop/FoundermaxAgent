@@ -2,11 +2,14 @@
 
 import { useState } from 'react'
 import { BackendLogDialog } from '@/components/BackendLogDialog'
+import { CustomerTableDialog } from '@/components/CustomerTableDialog'
+import { OrderHistoryDialog } from '@/components/OrderHistoryDialog'
 import { RefundPolicyDialog } from '@/components/RefundPolicyDialog'
 import {
   ChevronRightIcon,
   ClockIcon,
   CloseIcon,
+  GlobeIcon,
   InfoIcon,
   LockIcon,
   RobotIcon,
@@ -36,6 +39,8 @@ type Props = {
 export function RightSidebar({ isOpen, onClose, onPromptClick, executionLog, disabled }: Props) {
   const [logOpen, setLogOpen] = useState(false)
   const [policyOpen, setPolicyOpen] = useState(false)
+  const [customersOpen, setCustomersOpen] = useState(false)
+  const [ordersOpen, setOrdersOpen] = useState(false)
   return (
     <>
       <aside className={`right-sidebar ${isOpen ? 'open' : ''}`}>
@@ -65,14 +70,34 @@ export function RightSidebar({ isOpen, onClose, onPromptClick, executionLog, dis
           </ul>
         </div>
 
-        <button
-          type="button"
-          className="policy-view-btn"
-          onClick={() => setPolicyOpen(true)}
-        >
-          <ShieldIcon size={16} />
-          <span>View Refund Policy</span>
-        </button>
+        <div className="sidebar-actions">
+          <button
+            type="button"
+            className="policy-view-btn"
+            onClick={() => setPolicyOpen(true)}
+          >
+            <ShieldIcon size={16} />
+            <span>View Refund Policy</span>
+          </button>
+
+          <button
+            type="button"
+            className="policy-view-btn"
+            onClick={() => setCustomersOpen(true)}
+          >
+            <GlobeIcon size={16} />
+            <span>View Customer Table</span>
+          </button>
+
+          <button
+            type="button"
+            className="policy-view-btn"
+            onClick={() => setOrdersOpen(true)}
+          >
+            <ClockIcon size={16} />
+            <span>View Order History</span>
+          </button>
+        </div>
 
         <div className="prompts-card">
           <h3>Suggested Prompts</h3>
@@ -107,6 +132,8 @@ export function RightSidebar({ isOpen, onClose, onPromptClick, executionLog, dis
         log={executionLog}
       />
       <RefundPolicyDialog isOpen={policyOpen} onClose={() => setPolicyOpen(false)} />
+      <CustomerTableDialog isOpen={customersOpen} onClose={() => setCustomersOpen(false)} />
+      <OrderHistoryDialog isOpen={ordersOpen} onClose={() => setOrdersOpen(false)} />
       {isOpen && <div className="sidebar-overlay right-overlay" onClick={onClose} aria-hidden="true" />}
     </>
   )

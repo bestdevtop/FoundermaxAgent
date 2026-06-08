@@ -57,3 +57,7 @@ export function getCustomerByEmail(email: string): Customer | null {
   const normalized = email.trim().toLowerCase()
   return loadCustomers().find((c) => c.email.toLowerCase() === normalized) ?? null
 }
+
+export function getAllCustomers(): Customer[] {
+  return [...loadCustomers()]
+}

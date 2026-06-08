@@ -1,6 +1,7 @@
 import { randomBytes } from 'crypto'
 import type { Customer } from '@/lib/services/customer-service'
 import type { Order } from '@/lib/services/order-service'
+import { markOrderRefundRequested } from '@/lib/services/order-service'
 
 export type { Customer }
 
@@ -182,6 +183,10 @@ export function getRefundRequestsByCustomer(customerId: string) {
     .sort((a, b) => b.created_at.localeCompare(a.created_at))
 }
 
+export function getRefundRequestedOrderIds(): Set<string> {
+  return new Set(refundRequests.map((r) => r.order_id))
+}
+
 export function createRefundRequest(order: Order, customer: Customer, reason: string) {
   const orderId = order.order_id
   const customerId = customer.customer_id
@@ -228,6 +233,7 @@ export function createRefundRequest(order: Order, customer: Customer, reason: st
     created_at: createdAt,
   }
   refundRequests.push(request)
+  markOrderRefundRequested(orderId)
 
   const messages = {
     APPROVED: 'Refund request approved and submitted for processing.',
