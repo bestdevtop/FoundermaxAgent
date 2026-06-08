@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Markdown from 'react-markdown'
 import { CloseIcon } from '@/components/Icons'
 
 type Props = {
@@ -70,7 +71,11 @@ export function RefundPolicyDialog({ isOpen, onClose }: Props) {
         <div className="dialog-body">
           {loading && <p className="dialog-empty">Loading policy…</p>}
           {error && <p className="dialog-error">{error}</p>}
-          {!loading && !error && policy && <pre className="dialog-policy">{policy}</pre>}
+          {!loading && !error && policy && (
+            <div className="dialog-policy message-markdown">
+              <Markdown>{policy}</Markdown>
+            </div>
+          )}
         </div>
       </div>
     </div>
