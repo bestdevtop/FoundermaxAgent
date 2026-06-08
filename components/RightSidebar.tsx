@@ -23,8 +23,6 @@ const SUGGESTED_PROMPTS = [
   'I want a refund for order O1025',
   "What's the return policy for gift cards?",
   'Find customer C001',
-  'Help me write a professional email',
-  'Summarize this article',
 ]
 
 type Props = {
