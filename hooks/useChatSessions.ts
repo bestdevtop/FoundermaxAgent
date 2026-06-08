@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ChatHistoryItem } from '@/components/LeftSidebar'
-import type { ChatMessage, ChatResponse } from '@/types/chat'
+import type { ChatMessage, ChatStreamEvent } from '@/types/chat'
 
 const STORAGE_KEY = 'foundersmax_sessions'
 
@@ -193,6 +193,8 @@ export function useChatSessions() {
         content: m.content,
       }))
 
+      const assistantId = crypto.randomUUID()
+
       try {
         const res = await fetch('/api/chat', {
           method: 'POST',
@@ -208,27 +210,126 @@ export function useChatSessions() {
           throw new Error(body.detail ?? 'Failed to send message')
         }
 
-        const data: ChatResponse = await res.json()
-
-        const assistantMessage: ChatMessage = {
-          id: crypto.randomUUID(),
-          role: 'assistant',
-          content: data.response,
-          timestamp: new Date(),
+        if (!res.body) {
+          throw new Error('No response stream received')
         }
 
-        setSessions((prev) =>
-          prev.map((s) => {
-            if (s.id !== activeId) return s
-            return {
-              ...s,
-              backendSessionId: data.session_id,
-              messages: [...s.messages, assistantMessage],
-              executionLog: data.execution_log ?? [],
-              updatedAt: new Date().toISOString(),
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+        let buffer = ''
+
+        const upsertStreamingMessage = (content: string, streaming: boolean) => {
+          setSessions((prev) =>
+            prev.map((s) => {
+              if (s.id !== activeId) return s
+
+              const exists = s.messages.some((m) => m.id === assistantId)
+              if (!exists) {
+                return {
+                  ...s,
+                  messages: [
+                    ...s.messages,
+                    {
+                      id: assistantId,
+                      role: 'assistant',
+                      content,
+                      timestamp: new Date(),
+                      streaming,
+                    },
+                  ],
+                }
+              }
+
+              return {
+                ...s,
+                messages: s.messages.map((m) =>
+                  m.id === assistantId ? { ...m, content, streaming } : m,
+                ),
+              }
+            }),
+          )
+        }
+
+        const finalizeAssistantMessage = (
+          content: string,
+          sessionId: string,
+          executionLog: string[],
+        ) => {
+          setSessions((prev) =>
+            prev.map((s) => {
+              if (s.id !== activeId) return s
+
+              const exists = s.messages.some((m) => m.id === assistantId)
+              const assistantMessage: ChatMessage = {
+                id: assistantId,
+                role: 'assistant',
+                content,
+                timestamp: new Date(),
+              }
+
+              return {
+                ...s,
+                backendSessionId: sessionId,
+                messages: exists
+                  ? s.messages.map((m) =>
+                      m.id === assistantId ? { ...assistantMessage, streaming: false } : m,
+                    )
+                  : [...s.messages, assistantMessage],
+                executionLog,
+                updatedAt: new Date().toISOString(),
+              }
+            }),
+          )
+        }
+
+        const handleStreamEvent = (event: ChatStreamEvent) => {
+          if (event.type === 'reset') {
+            upsertStreamingMessage('', true)
+          } else if (event.type === 'token') {
+            upsertStreamingMessage(event.content, true)
+          } else if (event.type === 'done') {
+            finalizeAssistantMessage(
+              event.response,
+              event.session_id,
+              event.execution_log ?? [],
+            )
+          } else if (event.type === 'error') {
+            throw new Error(event.message)
+          }
+        }
+
+        const processBufferLines = (flushRemainder: boolean) => {
+          let newlineIndex = buffer.indexOf('\n')
+          while (newlineIndex !== -1) {
+            const line = buffer.slice(0, newlineIndex).trim()
+            buffer = buffer.slice(newlineIndex + 1)
+            if (line) {
+              handleStreamEvent(JSON.parse(line) as ChatStreamEvent)
             }
-          }),
-        )
+            newlineIndex = buffer.indexOf('\n')
+          }
+
+          if (flushRemainder) {
+            const remainder = buffer.trim()
+            buffer = ''
+            if (remainder) {
+              handleStreamEvent(JSON.parse(remainder) as ChatStreamEvent)
+            }
+          }
+        }
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (value) {
+            buffer += decoder.decode(value, { stream: !done })
+          }
+          processBufferLines(false)
+          if (done) {
+            buffer += decoder.decode()
+            processBufferLines(true)
+            break
+          }
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Something went wrong')
       } finally {

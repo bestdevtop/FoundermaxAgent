@@ -1,20 +1,11 @@
-import { NextResponse } from 'next/server'
-import { runAgent } from '@/lib/agent/agent'
+import { runAgentStream } from '@/lib/agent/agent'
+import type { ChatStreamEvent } from '@/types/chat'
 
 export const runtime = 'nodejs'
 
-export async function POST(request: Request) {
-  let body: {
-    messages?: Array<{ role?: string; content?: string }>
-    session_id?: string
-  }
-
-  try {
-    body = await request.json()
-  } catch {
-    return NextResponse.json({ detail: 'Invalid JSON body' }, { status: 400 })
-  }
-
+function parseMessages(body: {
+  messages?: Array<{ role?: string; content?: string }>
+}) {
   const messages = (body.messages ?? [])
     .filter(
       (entry): entry is { role: 'user' | 'assistant'; content: string } =>
@@ -26,21 +17,70 @@ export async function POST(request: Request) {
 
   const lastMessage = messages.at(-1)
   if (!lastMessage || lastMessage.role !== 'user') {
-    return NextResponse.json(
-      { detail: 'messages required with the last entry being a user message' },
-      { status: 400 },
-    )
+    return null
+  }
+
+  return messages
+}
+
+export async function POST(request: Request) {
+  let body: {
+    messages?: Array<{ role?: string; content?: string }>
+    session_id?: string
   }
 
   try {
-    const [response, sessionId, executionLog] = await runAgent(messages, body.session_id)
-    return NextResponse.json({
-      response,
-      session_id: sessionId,
-      execution_log: executionLog,
+    body = await request.json()
+  } catch {
+    return new Response(JSON.stringify({ detail: 'Invalid JSON body' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
-    const detail = error instanceof Error ? error.message : String(error)
-    return NextResponse.json({ detail }, { status: 500 })
   }
+
+  const messages = parseMessages(body)
+  if (!messages) {
+    return new Response(
+      JSON.stringify({
+        detail: 'messages required with the last entry being a user message',
+      }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } },
+    )
+  }
+
+  const encoder = new TextEncoder()
+
+  const stream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const send = (event: ChatStreamEvent) => {
+        controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`))
+      }
+
+      try {
+        const result = await runAgentStream(messages, body.session_id, {
+          onReset: () => send({ type: 'reset' }),
+          onToken: (content) => send({ type: 'token', content }),
+        })
+
+        send({
+          type: 'done',
+          response: result.response,
+          session_id: result.sessionId,
+          execution_log: result.executionLog,
+        })
+        controller.close()
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
+        send({ type: 'error', message })
+        controller.close()
+      }
+    },
+  })
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'application/x-ndjson',
+      'Cache-Control': 'no-cache, no-transform',
+    },
+  })
 }

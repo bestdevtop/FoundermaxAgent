@@ -36,11 +36,28 @@ function getAgent() {
   return agent
 }
 
+function stringifyMessageContent(content: unknown): string {
+  if (typeof content === 'string') return content
+  if (Array.isArray(content)) {
+    return content
+      .map((block) => {
+        if (typeof block === 'string') return block
+        if (block && typeof block === 'object' && 'text' in block) {
+          return String((block as { text?: unknown }).text ?? '')
+        }
+        return ''
+      })
+      .join('')
+  }
+  return content != null ? String(content) : ''
+}
+
 function extractResponse(messages: BaseMessage[]): string {
   for (let i = messages.length - 1; i >= 0; i -= 1) {
     const msg = messages[i]
-    if (msg instanceof AIMessage && msg.content) {
-      return String(msg.content)
+    if (msg instanceof AIMessage && msg.content && !msg.tool_calls?.length) {
+      const text = stringifyMessageContent(msg.content).trim()
+      if (text) return text
     }
     if (
       typeof msg === 'object' &&
@@ -49,7 +66,8 @@ function extractResponse(messages: BaseMessage[]): string {
       (msg as { role?: string }).role === 'assistant' &&
       'content' in msg
     ) {
-      return String((msg as { content?: unknown }).content ?? '')
+      const text = stringifyMessageContent((msg as { content?: unknown }).content).trim()
+      if (text) return text
     }
   }
   return "I'm sorry, I couldn't generate a response. Please try again."
@@ -68,10 +86,16 @@ function toLangChainMessages(history: ChatHistoryEntry[]): BaseMessage[] {
   )
 }
 
-export async function runAgent(
+type AgentStreamCallbacks = {
+  onReset: () => void
+  onToken: (content: string) => void
+}
+
+export async function runAgentStream(
   history: ChatHistoryEntry[],
-  sessionId?: string | null,
-): Promise<[string, string, string[]]> {
+  sessionId: string | null | undefined,
+  callbacks: AgentStreamCallbacks,
+): Promise<{ response: string; sessionId: string; executionLog: string[] }> {
   bootstrap()
 
   const threadId = sessionId ?? randomUUID()
@@ -79,11 +103,26 @@ export async function runAgent(
   await policyService.initPolicyIndex()
   await knowledgeService.initFaqIndex()
 
-  const result = await getAgent().invoke({
-    messages: toLangChainMessages(history),
-  })
+  const run = await getAgent().streamEvents(
+    { messages: toLangChainMessages(history) },
+    { version: 'v3' },
+  )
 
-  const messages = result.messages as BaseMessage[]
+  let response = ''
+
+  for await (const msg of run.messages) {
+    callbacks.onReset()
+    let messageText = ''
+
+    for await (const token of msg.text) {
+      messageText += token
+      response = messageText
+      callbacks.onToken(messageText)
+    }
+  }
+
+  const output = await run.output
+  const messages = output.messages as BaseMessage[]
   const lastUserMessage =
     [...history].reverse().find((entry) => entry.role === 'user')?.content ?? ''
   const executionLog = buildExecutionLog(messages, {
@@ -92,5 +131,12 @@ export async function runAgent(
     historyLength: history.length,
   })
 
-  return [extractResponse(messages), threadId, executionLog]
+  const extracted = extractResponse(messages)
+  if (extracted !== "I'm sorry, I couldn't generate a response. Please try again.") {
+    response = extracted
+  } else if (!response.trim()) {
+    response = extracted
+  }
+
+  return { response, sessionId: threadId, executionLog }
 }

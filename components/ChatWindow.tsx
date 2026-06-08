@@ -16,6 +16,9 @@ type Props = {
 export function ChatWindow({ messages, loading, error, onSend }: Props) {
   const messagesRef = useRef<HTMLDivElement>(null)
 
+  const visibleMessages = messages.filter((msg) => !(msg.streaming && !msg.content))
+  const showTyping = loading && !messages.some((msg) => msg.streaming && msg.content)
+
   useEffect(() => {
     const container = messagesRef.current
     if (!container) return
@@ -25,10 +28,10 @@ export function ChatWindow({ messages, loading, error, onSend }: Props) {
   return (
     <section className="chat-window">
       <div className="chat-messages" ref={messagesRef}>
-        {messages.map((msg) => (
+        {visibleMessages.map((msg) => (
           <MessageBubble key={msg.id} message={msg} />
         ))}
-        {loading && (
+        {showTyping && (
           <div className="message-row assistant">
             <div className="message-avatar assistant" aria-hidden="true">
               <RobotIcon size={18} />
