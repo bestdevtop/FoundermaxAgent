@@ -9,6 +9,7 @@ import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters'
 import { DATA_DIR } from '@/lib/paths'
 
 const EMBEDDING_MODEL = 'text-embedding-3-small'
+const EMBEDDING_DIMENSIONS = Number(process.env.PINECONE_EMBEDDING_DIMENSIONS ?? 512)
 
 function requireEnv(name: string): string {
   const value = process.env[name]
@@ -19,7 +20,10 @@ function requireEnv(name: string): string {
 }
 
 function getEmbeddings(): OpenAIEmbeddings {
-  return new OpenAIEmbeddings({ model: EMBEDDING_MODEL })
+  return new OpenAIEmbeddings({
+    model: EMBEDDING_MODEL,
+    dimensions: EMBEDDING_DIMENSIONS,
+  })
 }
 
 function getPineconeClient(): Pinecone {

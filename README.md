@@ -25,7 +25,7 @@ Unified Next.js application combining the FoundersMax customer support chat UI a
 
    Set `OPENAI_API_KEY`, `PINECONE_API_KEY`, and `PINECONE_INDEX` in `.env.local`.
 
-   Create a Pinecone index named to match `PINECONE_INDEX` with dimension **1536** (for `text-embedding-3-small`).
+   Create a Pinecone index named to match `PINECONE_INDEX`. Set `PINECONE_EMBEDDING_DIMENSIONS` to the same value as the index (e.g. **512** or **1536** for `text-embedding-3-small`).
 
 3. Start the dev server:
 
