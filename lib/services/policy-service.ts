@@ -10,7 +10,7 @@ let vectorstore: VectorStore | null = null
 
 export async function initPolicyIndex(): Promise<void> {
   if (vectorstore !== null) return
-  vectorstore = await createRagStore('refund_return_policy_v2026.txt')
+  vectorstore = await createRagStore('refund_return_policy_v2026.txt', 'policy')
 }
 
 export function getPolicy(): string {

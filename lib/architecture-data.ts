@@ -40,7 +40,7 @@ export const REQUEST_FLOW: FlowStep[] = [
     title: 'Agent bootstraps & converts history',
     path: 'lib/agent/agent.ts',
     description:
-      'On first run: loads orders/customers from JSON, builds in-memory vector indexes for policy & FAQ (OpenAI embeddings). Converts chat history into LangChain HumanMessage / AIMessage objects.',
+      'On first run: loads orders/customers from JSON, seeds Pinecone namespaces for policy & FAQ if empty. Converts chat history into LangChain HumanMessage / AIMessage objects.',
   },
   {
     id: 5,
@@ -55,7 +55,7 @@ export const REQUEST_FLOW: FlowStep[] = [
     title: 'Tools call services & data',
     path: 'lib/services/* + data/*',
     description:
-      'Each tool delegates to a service layer — JSON files for orders/customers/products, in-memory vector search (RAG) for policy/FAQ, rules engine for refunds.',
+      'Each tool delegates to a service layer — JSON files for orders/customers/products, Pinecone vector search (RAG) for policy/FAQ, rules engine for refunds.',
   },
   {
     id: 7,
@@ -112,14 +112,14 @@ export const AGENT_TOOLS: AgentTool[] = [
   {
     name: 'refund_policy_search',
     service: 'policy-service',
-    dataSource: 'Vector search → refund_return_policy_v2026.txt',
+    dataSource: 'Pinecone (policy ns) → refund_return_policy_v2026.txt',
     description: 'Semantic search over refund & return policy clauses.',
     useWhen: 'Return windows, non-refundable items, escalation rules',
   },
   {
     name: 'search_knowledge_base',
     service: 'knowledge-service',
-    dataSource: 'Vector search → faq_knowledge_base.txt',
+    dataSource: 'Pinecone (faq ns) → faq_knowledge_base.txt',
     description: 'Semantic search over FAQ entries.',
     useWhen: 'Shipping, payments, account help, cancellations',
   },

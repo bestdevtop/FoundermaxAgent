@@ -7,7 +7,7 @@ Unified Next.js application combining the FoundersMax customer support chat UI a
 - **Frontend:** Next.js App Router, React 19, plain CSS
 - **Backend:** Next.js API routes (`/api/chat`, `/api/health`, `/api/policy`)
 - **Agent:** LangChain JS + OpenAI (`gpt-4o-mini`) with 9 support tools
-- **Data:** JSON order/product/customer files, in-memory refund store, in-memory vector search (OpenAI embeddings)
+- **Data:** JSON order/product/customer files, in-memory refund store, Pinecone vector search (OpenAI embeddings)
 
 ## Setup
 
@@ -23,7 +23,9 @@ Unified Next.js application combining the FoundersMax customer support chat UI a
    cp .env.example .env.local
    ```
 
-   Set `OPENAI_API_KEY` in `.env.local` (required for chat and vector embeddings).
+   Set `OPENAI_API_KEY`, `PINECONE_API_KEY`, and `PINECONE_INDEX` in `.env.local`.
+
+   Create a Pinecone index named to match `PINECONE_INDEX` with dimension **1536** (for `text-embedding-3-small`).
 
 3. Start the dev server:
 
@@ -55,8 +57,8 @@ runAgent()  ──►  LangChain agent (gpt-4o-mini + system prompt)
     ├── customer_lookup ───────────► customers.json
     ├── get_customer_history ──────► customers.json + orders.json
     ├── get_product_info ──────────► products.json
-    ├── refund_policy_search ──────► in-memory vector store (policy RAG)
-    ├── search_knowledge_base ─────► in-memory vector store (FAQ RAG)
+    ├── refund_policy_search ──────► Pinecone namespace: policy
+    ├── search_knowledge_base ─────► Pinecone namespace: faq
     ├── check_refund_eligibility ──► refund-service (rules engine)
     └── create_refund_request ─────► refund-service (in-memory store)
     │
@@ -100,7 +102,7 @@ Side panel (no chat required):
 2. **`prompt.ts`** — System prompt defining support tone, tool usage rules, and refund workflow.
 3. **`execution-log.ts`** — Builds a human-readable log of tool calls for the backend log viewer.
 
-On first request the agent bootstraps JSON data (`initCustomers`, `initOrders`) and builds in-memory vector indexes for policy and FAQ search.
+On first request the agent bootstraps JSON data (`initCustomers`, `initOrders`) and seeds Pinecone namespaces for policy and FAQ search if they are empty.
 
 ### Layer 4 — Tools (`lib/tools/index.ts`)
 
@@ -113,8 +115,8 @@ Nine tools the LLM can call:
 | `customer_lookup` | `customer-service` | `data/customers.json` |
 | `get_customer_history` | `crm-service` | customers + orders |
 | `get_product_info` | `product-service` | `data/products.json` |
-| `refund_policy_search` | `policy-service` | Vector search over `refund_return_policy_v2026.txt` |
-| `search_knowledge_base` | `knowledge-service` | Vector search over `faq_knowledge_base.txt` |
+| `refund_policy_search` | `policy-service` | Pinecone `policy` namespace over `refund_return_policy_v2026.txt` |
+| `search_knowledge_base` | `knowledge-service` | Pinecone `faq` namespace over `faq_knowledge_base.txt` |
 | `check_refund_eligibility` | `refund-service` | rules engine |
 | `create_refund_request` | `refund-service` | in-memory refund store |
 
@@ -127,8 +129,8 @@ Nine tools the LLM can call:
 | `data/products.json` | Product specs and warranty info |
 | `data/refund_return_policy_v2026.txt` | Full refund & return policy (markdown) |
 | `data/faq_knowledge_base.txt` | FAQ entries for general support questions |
-| In-memory policy vector store | Built at startup from `refund_return_policy_v2026.txt` (top-3 similarity search) |
-| In-memory FAQ vector store | Built at startup from `faq_knowledge_base.txt` (top-3 similarity search) |
+| Pinecone `policy` namespace | Seeded at startup from `refund_return_policy_v2026.txt` (top-3 similarity search) |
+| Pinecone `faq` namespace | Seeded at startup from `faq_knowledge_base.txt` (top-3 similarity search) |
 | In-memory refund store | Refund requests created during the server process lifetime |
 
 ## End-to-End Request Flow
@@ -146,7 +148,7 @@ Nine tools the LLM can call:
 On the first request, the agent:
 
 - Loads customers and orders from JSON files (`initCustomers`, `initOrders`)
-- Builds in-memory vector indexes for the refund policy and FAQ (requires `OPENAI_API_KEY`)
+- Seeds Pinecone namespaces for the refund policy and FAQ if empty (requires `OPENAI_API_KEY` and Pinecone credentials)
 - Creates a LangChain agent with `gpt-4o-mini`, 9 tools, and a system prompt
 
 The agent receives the entire chat history, decides which tools to call, and returns a natural-language response (rendered as markdown in the chat).
@@ -333,7 +335,7 @@ foundermaxagent/
 │   │   ├── order-service.ts      # Order lookup (JSON)
 │   │   ├── policy-service.ts     # Policy file + RAG search
 │   │   ├── product-service.ts    # Product lookup (JSON)
-│   │   ├── rag-store.ts          # Shared in-memory vector store helpers
+│   │   ├── rag-store.ts          # Shared Pinecone vector store helpers
 │   │   ├── refund-service.ts     # Eligibility rules + request creation
 │   │   └── shipment-service.ts   # Tracking status
 │   ├── tools/
@@ -350,7 +352,7 @@ foundermaxagent/
 │   ├── refund_return_policy_v2026.txt
 │   └── faq_knowledge_base.txt
 │
-├── instrumentation.ts            # Pre-build in-memory vector indexes on server start
+├── instrumentation.ts            # Pre-seed Pinecone namespaces on server start
 ├── next.config.ts
 ├── package.json
 └── tsconfig.json
@@ -371,7 +373,7 @@ localStorage ◄──► useChatSessions
                                    │
                     ┌──────────────┼──────────────┐
                     ▼              ▼              ▼
-              gpt-4o-mini      9 tools       JSON + vector RAG
+              gpt-4o-mini      9 tools       JSON + Pinecone RAG
                     │              │              │
                     └──────────────┴──────────────┘
                                    │
@@ -391,7 +393,7 @@ Suggested prompts (available in the right sidebar):
 
 ## Notes
 
-- Vector indexes are built in memory on startup via `instrumentation.ts` (or on first chat request).
+- Pinecone namespaces are seeded on startup via `instrumentation.ts` (or on first chat request) if they have no vectors yet.
 - Chat history is stored in the browser (`localStorage`) and sent in full on each API request — the server does not persist conversation state.
 - Refund requests are stored in memory for the server process lifetime (not persisted to a database).
 - The original `backend/` and `frontend/` folders are unchanged; this project is a standalone migration.

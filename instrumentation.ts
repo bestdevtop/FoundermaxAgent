@@ -12,7 +12,7 @@ export async function register() {
       await initPolicyIndex()
       await initFaqIndex()
     } catch {
-      // Vector index init may fail without OPENAI_API_KEY at build time
+      // Pinecone index init may fail without API keys at build time
     }
   }
 }
