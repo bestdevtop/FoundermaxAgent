@@ -30,14 +30,19 @@ export function ChatWindow({ messages, loading, error, onSend }: Props) {
         ))}
         {loading && (
           <div className="message-row assistant">
-            <div className="assistant-avatar">
+            <div className="message-avatar assistant" aria-hidden="true">
               <RobotIcon size={18} />
             </div>
-            <div className="message-bubble assistant typing">
-              <div className="typing-dots">
-                <span />
-                <span />
-                <span />
+            <div className="message-content assistant">
+              <div className="message-sender assistant">
+                <span>FoundersMax Support</span>
+              </div>
+              <div className="message-bubble assistant typing">
+                <div className="typing-dots">
+                  <span />
+                  <span />
+                  <span />
+                </div>
               </div>
             </div>
           </div>
