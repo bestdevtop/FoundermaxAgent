@@ -298,15 +298,14 @@ export function useChatSessions() {
           }
         }
 
-        const processBufferLines = (flushRemainder: boolean) => {
-          let newlineIndex = buffer.indexOf('\n')
-          while (newlineIndex !== -1) {
-            const line = buffer.slice(0, newlineIndex).trim()
-            buffer = buffer.slice(newlineIndex + 1)
-            if (line) {
-              handleStreamEvent(JSON.parse(line) as ChatStreamEvent)
-            }
-            newlineIndex = buffer.indexOf('\n')
+        const processBufferLines = (flushRemainder = false) => {
+          const lines = buffer.split('\n')
+          buffer = lines.pop() ?? ''
+
+          for (const line of lines) {
+            const trimmed = line.trim()
+            if (!trimmed) continue
+            handleStreamEvent(JSON.parse(trimmed) as ChatStreamEvent)
           }
 
           if (flushRemainder) {
@@ -323,7 +322,7 @@ export function useChatSessions() {
           if (value) {
             buffer += decoder.decode(value, { stream: !done })
           }
-          processBufferLines(false)
+          processBufferLines()
           if (done) {
             buffer += decoder.decode()
             processBufferLines(true)
