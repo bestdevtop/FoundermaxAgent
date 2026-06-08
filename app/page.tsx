@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { ArchitectureFlowDialog } from '@/components/ArchitectureFlowDialog'
+import { FlowIcon } from '@/components/Icons'
 import { ChatHeader } from '@/components/ChatHeader'
 import { ChatWindow } from '@/components/ChatWindow'
 import { LeftSidebar } from '@/components/LeftSidebar'
@@ -10,6 +12,7 @@ import { useChatSessions } from '@/hooks/useChatSessions'
 export default function Home() {
   const [leftOpen, setLeftOpen] = useState(false)
   const [rightOpen, setRightOpen] = useState(false)
+  const [architectureOpen, setArchitectureOpen] = useState(false)
 
   const {
     messages,
@@ -60,7 +63,19 @@ export default function Home() {
           error={error}
           onSend={sendMessage}
         />
+        <button
+          type="button"
+          className="architecture-fab"
+          onClick={() => setArchitectureOpen(true)}
+          aria-label="View app architecture and request flow"
+          title="How it works"
+        >
+          <FlowIcon size={20} />
+          <span>How it works</span>
+        </button>
       </main>
+
+      <ArchitectureFlowDialog isOpen={architectureOpen} onClose={() => setArchitectureOpen(false)} />
 
       <RightSidebar
         isOpen={rightOpen}

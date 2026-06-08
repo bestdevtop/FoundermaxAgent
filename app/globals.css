@@ -73,6 +73,7 @@ code {
 }
 
 .main-column {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -1086,6 +1087,319 @@ code {
   display: none;
 }
 
+/* ── Architecture FAB & Dialog ── */
+.architecture-fab {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 5.75rem;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.architecture-fab:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.18);
+  transform: translateY(-1px);
+}
+
+.architecture-fab svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.dialog-panel-architecture {
+  width: min(860px, 100%);
+  max-height: 88vh;
+}
+
+.arch-tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0 1.25rem;
+  border-bottom: 1px solid var(--color-border-light);
+  flex-shrink: 0;
+}
+
+.arch-tab {
+  padding: 0.65rem 0.85rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.arch-tab:hover {
+  color: var(--color-text);
+}
+
+.arch-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.arch-intro {
+  margin: 0 0 1.25rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.flow-diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.flow-step-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.flow-step {
+  display: flex;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+}
+
+.flow-step-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.flow-step-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.flow-step-body h3 {
+  margin: 0 0 0.25rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.flow-step-path {
+  display: inline-block;
+  margin-bottom: 0.4rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: var(--color-border-light);
+  font-size: 0.6875rem;
+  color: var(--color-primary);
+}
+
+.flow-step-body p {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.flow-step-detail {
+  margin-top: 0.35rem !important;
+  font-size: 0.75rem !important;
+  font-style: italic;
+}
+
+.flow-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 1.5rem;
+  color: var(--color-text-muted);
+}
+
+.flow-connector-line {
+  width: 2px;
+  flex: 1;
+  background: var(--color-border);
+}
+
+.flow-connector-arrow {
+  font-size: 0.625rem;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.flow-tools-branch {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.flow-branch-label {
+  margin-bottom: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.flow-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.5rem;
+}
+
+.flow-tool-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: 8px;
+  background: var(--color-bg);
+}
+
+.flow-tool-name {
+  font-family: ui-monospace, monospace;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.flow-tool-source {
+  font-size: 0.625rem;
+  color: var(--color-text-muted);
+  line-height: 1.3;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.75rem;
+}
+
+.tool-card {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+}
+
+.tool-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.tool-card-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.tool-card-service {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+}
+
+.tool-card-desc {
+  margin: 0 0 0.65rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--color-text);
+}
+
+.tool-card-meta {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.tool-card-meta div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.tool-card-meta dt {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.tool-card-meta dd {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
+.arch-tree {
+  margin: 0 0 1.25rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  font-size: 0.75rem;
+  line-height: 1.55;
+  color: var(--color-text);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.arch-legend h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.arch-legend ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.arch-legend li + li {
+  margin-top: 0.35rem;
+}
+
+.arch-legend strong {
+  color: var(--color-text);
+}
+
 /* ── Mobile / Tablet ── */
 @media (max-width: 1024px) {
   .app-layout {
@@ -1187,5 +1501,24 @@ code {
   .message-content,
   .message-bubble {
     max-width: calc(100% - 44px);
+  }
+
+  .architecture-fab span {
+    display: none;
+  }
+
+  .architecture-fab {
+    right: 0.75rem;
+    bottom: 5.25rem;
+    padding: 0.65rem;
+    border-radius: 50%;
+  }
+
+  .flow-tools-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tools-grid {
+    grid-template-columns: 1fr;
   }
 }

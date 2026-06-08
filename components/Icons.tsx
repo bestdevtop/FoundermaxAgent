@@ -3,6 +3,17 @@ type IconProps = {
   size?: number
 }
 
+export function FlowIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <rect x="3" y="3" width="6" height="4" rx="1" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="15" y="3" width="6" height="4" rx="1" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="9" y="17" width="6" height="4" rx="1" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M6 7v3h12V7M12 10v7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 export function UserIcon({ className, size = 24 }: IconProps) {
   return (
     <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none">
